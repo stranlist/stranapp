@@ -1,0 +1,2 @@
+# stranapp
+Stran List App
