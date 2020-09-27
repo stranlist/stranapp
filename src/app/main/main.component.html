@@ -1,4 +1,26 @@
-<mat-advanced-audio-player [playlist]="msaapPlaylist" [displayTitle]="msaapDisplayTitle" [autoPlay]="false"
-    muted="muted" [displayPlaylist]="msaapDisplayPlayList" [pageSizeOptions]="msaapPageSizeOptions"
-    (trackEnded)="onEnded($event)" [displayVolumeControls]="msaapDisplayVolumeControls" [expanded]="true">
-</mat-advanced-audio-player>
+<ngx-audio-player [playlist]="audioOptions.playList" [displayTitle]="audioOptions.displayTitle" [autoPlay]="true"
+    muted="muted" [displayPlaylist]="audioOptions.displayPlayList" [pageSizeOptions]="audioOptions.pageSizeOptions"
+    (trackEnded)="onEnded($event)" [displayVolumeControls]="audioOptions.displayVolumeControls" [expanded]="false">
+</ngx-audio-player>
+
+<div class="container">
+    <div class="row">
+
+        <mat-form-field class="example-form-field mt-5 w-100">
+            <mat-label>stran</mat-label>
+            <input matInput type="text" (change)="searchChange($event)">
+        </mat-form-field>
+
+        <mat-card id="mat-card-list" class="mt-2 w-100" style="max-height: 400px; overflow: auto;">
+            <mat-selection-list [multiple]="false">
+                <mat-list-option (click)="selectMusic(i)" *ngFor="let i of displayMusicList" role="listitem">{{i.title}}
+                </mat-list-option>
+            </mat-selection-list>
+        </mat-card>
+
+        <div class="w-100 mt-2 bg-light rounded p-3">
+            <span>{{displayMusicList.length}} stran</span>
+        </div>
+
+    </div>
+</div>

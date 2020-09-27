@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import { MainService } from "./main.service";
+import { MainService } from './main.service';
+import { MusicModel } from '../models/music.model';
 
 import { Track } from 'ngx-audio-player';
 
@@ -11,32 +12,63 @@ import { Track } from 'ngx-audio-player';
 })
 export class MainComponent implements OnInit {
 
-  constructor(private mainService: MainService) { }
+  public audioOptions = {
+    displayPlayList: false,
+    playList: null,
+    displayTitle: "",
+    pageSizeOptions: [5, 10, 20, 30, 50],
+    displayVolumeControls: true,
+    musicModel: new MusicModel()
+  };
+
+  public mainMusicList: Array<MusicModel>;
+  public displayMusicList: Array<MusicModel>;
+
+  constructor(private mainService: MainService) {
+    this.mainMusicList = new Array<MusicModel>();
+    this.displayMusicList = new Array<MusicModel>();
+  }
 
   ngOnInit(): void {
     this.mainService.GetList().subscribe(res => {
-      this.msaapPlaylist = new Array<Track>();
-
-      let list = res as [];
-
-      list.forEach(element => {
-        this.msaapPlaylist.push({
-          title: element["id"] + " - " + element["title"],
-          link: "https://archive.org/download/stranlist/" + element["id"] + ".mp3"
-        });
-      });
+      this.mainMusicList = res as Array<MusicModel>;
+      this.displayMusicList = res as Array<MusicModel>;
     });
   }
 
-  msaapDisplayTitle = true;
-  msaapDisplayPlayList = true;
-  msaapPageSizeOptions = [5, 10, 20, 30];
-  msaapDisplayVolumeControls = true;
+  public getTrack(model: MusicModel): Track {
+    let trackModel = new Track();
+    trackModel.title = model.title;
+    trackModel.link = "https://archive.org/download/stranlist/" + model.id + ".mp3";
 
-  msaapPlaylist: Track[] = [];
+    return trackModel;
+  }
 
   public onEnded(event) {
-    console.log(event);
+    let newIndex = this.displayMusicList.indexOf(this.audioOptions.musicModel) + 1;
+    let model = this.displayMusicList[newIndex];
+
+    if (model) {
+      this.selectMusic(model);
+    }
+  }
+
+  public searchChange(event) {
+    let searchText: string = event.target.value;
+    if (searchText.length < 3) {
+      this.displayMusicList = this.mainMusicList;
+      document.getElementById("mat-card-list").scroll(0, 0);
+      return;
+    }
+
+    this.displayMusicList = this.mainMusicList.filter(x => x.title.toLowerCase().includes(searchText.toLowerCase()));
+    document.getElementById("mat-card-list").scroll(0, 0);
+  }
+
+  public selectMusic(item: MusicModel) {
+    this.audioOptions.playList = [this.getTrack(item)];
+    this.audioOptions.displayTitle = item.title;
+    this.audioOptions.musicModel = item;
   }
 
 }
